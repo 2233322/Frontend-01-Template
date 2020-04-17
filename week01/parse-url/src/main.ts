@@ -1,0 +1,1 @@
+export { QueryString as default } from './query-string'
