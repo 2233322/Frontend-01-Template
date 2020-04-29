@@ -63,5 +63,5 @@
 // "Buddy, you're a boy make a big noise Playing in the streets gonna be a big man someday"
 // 'Buddy, youre a boy make a big noise Playing in the streets gonna be a big man someday'
 
-const parrt = /^\"[^\"\r\n]*\"$|^\'[^\'\r\n]*\'$/
-// TODO 还有些情况不会写
+//https://github.com/moling3650/Frontend-01-Template/blob/master/week02/03.String%20Literals.md
+const parrt = /^"(?:[^"\\\n\r]|\\(u[\da-fA-F]{4}|\\u\{(10|0?[\da-fA-F])[\da-fA-F]{0,4}\})|\\x[\da-fA-F]{2}|\\0(?!=\d)|\\\r\n|\\[^\dxu])*"$/

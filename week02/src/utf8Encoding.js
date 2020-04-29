@@ -10,37 +10,42 @@ UTF-8 是 Unicode 的实现方式之一
 const unicodeBlock = [0x7f, 0x7ff, 0xffff, 0x1fffff, 0x3ffffff, 0x7fffffff]
 
 var utf8Encoding = function (str) {
-  var list = []
-  for (var i = 0; i < str.length; i++) {
-    var code = str.charCodeAt(i)
+  const back = []
+  for (let i = 0, len = str.length; i < len; i++) {
+    let code = str.charCodeAt(i)
     console.log(code)
-    if (0x00 <= code && code <= 0x7f) {
-      byteSize += 1
-      list.push(code)
-    } else if (0x80 <= code && code <= 0x7ff) {
-      byteSize += 2
-      list.push(0b11000000 | (0b00011111 & (code >> 6)))
-      list.push(0b10000000 | (0b00111111 & code))
-    } else if (0x800 <= code && code <= 0xffff) {
-      byteSize += 3
-      list.push(0b11100000 | (0b00001111 & (code >> 12)))
-      list.push(0b10000000 | (0b00111111 & (code >> 6)))
-      list.push(0b10000000 | (0b00111111 & code))
-    } else if (0x10000 <= code && code <= 0x10ffff) {
-      byteSize += 4
-      list.push(0b11110000 | (0b00000111 & (code >> 18)))
-      list.push(0b10000000 | (0b00111111 & (code >> 12)))
-      list.push(0b10000000 | (0b00111111 & (code >> 6)))
-      list.push(0b10000000 | (0b00111111 & code))
+    if (code <= unicodeBlock[0]) {
+      // 0xxxxxxx
+      //a  1100001
+      // 01100001
+      back.push(code)
+    } else if (code <= unicodeBlock[1]) {
+      // ƒ
+      //110xxxxx 10xxxxxx
+      //10 000011
+      // 11000010 10000011
+      // c2 83
+      //0b11000000 | 0b00011111 & 0b10000011 >> 6
+      //0b10000000 | 0b00111111 & 0b10000011
+
+      back.push(0b11000000 | 0b00011111 & (code >> 6))
+      back.push(0b10000000 | 0b00111111 & (code))
+    } else if (code <= unicodeBlock[2]) {
+      // 中
+      // 1110xxxx 10xxxxxx 10xxxxxx
+      // 0100 111000 101101
+      // 11100100 10111000 10101101
+      // e4 b8 ad
+
+      back.push(0b11100000 | 0b00001111 & (code >> 12))
+      back.push(0b10000000 | 0b00111111 & (code >> 6))
+      back.push(0b10000000 | 0b00111111 & (code))
     }
   }
-  for (i = 0; i < list.length; i++) {
-    list[i] &= 0xff
-  }
 
-  const result = list.map((item) => item.toString(16))
+  console.log(back)
+  const result = back.map(item => item.toString(16))
   return result
 }
 
-
-console.log(utf8Encoding('广州'))
+console.log('结果：', utf8Encoding('中国'))
