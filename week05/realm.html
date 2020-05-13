@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Visual Realm</title>
+</head>
+
+<body>
+
+  <div id="container"></div>
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.0/build/g6.js"></script>
+  <script>
+    const data = {
+      id: 1
+    }
+    const Objects = [
+      'eval',
+      'isFinite',
+      'isNaN',
+      'parseFloat',
+      'parseInt',
+      'decodeURI',
+      'decodeURIComponent',
+      'encodeURI',
+      'encodeURIComponent',
+      'Array',
+      'Date',
+      'RegExp',
+      'Promise',
+      'Proxy',
+      'Map',
+      'WeakMap',
+      'Set',
+      'WeakSet',
+      'Function',
+      'Boolean',
+      'String',
+      'Number',
+      'Symbol',
+      'Object',
+      'Error',
+      'EvalError',
+      'RangeError',
+      'ReferenceError',
+      'SyntaxError',
+      'TypeError',
+      'URIError',
+      'ArrayBuffer',
+      'SharedArrayBuffer',
+      'DataView',
+      'Float32Array',
+      'Float64Array',
+      'Int8Array',
+      'Int16Array',
+      'Int32Array',
+      'Uint8Array',
+      'Uint16Array',
+      'Uint32Array',
+      'Uint8ClampedArray',
+      'Atomics',
+      'JSON',
+      'Math',
+      'Reflect'
+    ]
+
+    const set = new Set()
+
+    const GlobalObjects = {
+      id: 'GlobalObjects',
+      children: []
+    }
+
+    while (Objects.length) {
+      let current = Objects.shift()
+      GlobalObjects.children.push({
+        id: current,
+        children: setChildren(globalThis[current])
+      })
+    }
+
+
+    // 遍历property
+    function setChildren(o) {
+      let children = []
+      for (let p of Object.getOwnPropertyNames(o)) {
+        let property = Object.getOwnPropertyDescriptor(o, p)
+
+
+        // 获取get属性为Object
+        if (property.hasOwnProperty('value') && (property.value !== 'null' && typeof property.value === 'object') ||
+          typeof property.value === 'function') {
+
+          // 如果是对象就递归
+          if (typeof property.value === 'object') {
+            children.push({
+              id: 'property',
+              children: setChildren(property.value)
+            })
+          } else {
+            children.push({
+              id: p
+            })
+          }
+
+        }
+
+        if (property.hasOwnProperty('get') && typeof property.get === 'function') {
+          if (typeof property.get === 'object') {
+            children.push({
+              id: 'property',
+              children: setChildren(property.get)
+            })
+          } else {
+            children.push({
+              id: p
+            })
+          }
+        }
+
+        if (property.hasOwnProperty('set') && typeof property.set === 'function') {
+          if (typeof property.set === 'object') {
+            children.push({
+              id: 'property',
+              children: setChildren(property.set)
+            })
+          } else {
+            children.push({
+              id: p
+            })
+          }
+        }
+      }
+
+      return children
+    }
+
+    console.log(GlobalObjects)
+
+
+    const width = window.innerWidth
+    const height = window.innerHeight;
+    const graph = new G6.TreeGraph({
+      container: 'container',
+      width,
+      height,
+      modes: {
+        default: [{
+            type: 'collapse-expand',
+            onChange: function onChange(item, collapsed) {
+              const data = item.get('model').data;
+              data.collapsed = collapsed;
+              return true;
+            },
+          },
+          'drag-canvas',
+          'zoom-canvas',
+        ],
+      },
+      defaultNode: {
+        size: 26,
+        anchorPoints: [
+          [0, 0.5],
+          [1, 0.5],
+        ],
+        style: {
+          fill: '#C6E5FF',
+          stroke: '#5B8FF9',
+        },
+      },
+      defaultEdge: {
+        type: 'cubic-horizontal',
+        style: {
+          stroke: '#A3B1BF',
+        },
+      },
+      layout: {
+        type: 'compactBox',
+        direction: 'LR',
+        getId: function getId(d) {
+          return d.id;
+        },
+        getHeight: function getHeight() {
+          return 12;
+        },
+        getWidth: function getWidth() {
+          return 12;
+        },
+        getVGap: function getVGap() {
+          return 30;
+        },
+        getHGap: function getHGap() {
+          return 100;
+        },
+      },
+    });
+
+    graph.node(function (node) {
+      return {
+        label: node.id,
+        labelCfg: {
+          offset: 10,
+          position: node.children && node.children.length > 0 ? 'left' : 'right',
+        },
+      };
+    });
+
+    graph.data(GlobalObjects);
+    graph.render();
+    graph.fitView();
+  </script>
+</body>
+
+</html>
