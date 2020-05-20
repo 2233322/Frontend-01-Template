@@ -1,5 +1,5 @@
-const net = require("net");
-
+const net = require("net")
+const parser = require('./parser.js')
 
 class Request {
   // method, url = host + port + path
@@ -40,7 +40,7 @@ class Request {
   send() {
     let connection
     return new Promise((resolve, reject) => {
-      const parse = new ResponseParser;
+      const parse = new ResponseParser
       if (connection) {
         connection.write(this.toString())
       } else {
@@ -52,16 +52,16 @@ class Request {
         })
       }
       connection.on('data', (data) => {
-        parse.receive(data.toString());
+        parse.receive(data.toString())
         if (parse.isFinished) {
-          resolve(parse.response);
+          resolve(parse.response)
         }
-        connection.end();
-      });
+        connection.end()
+      })
       connection.on('error', (err) => {
-        reject(err);
-        connection.end();
-      });
+        reject(err)
+        connection.end()
+      })
     })
   }
 }
@@ -72,21 +72,21 @@ class Response {
 
 class ResponseParser {
   constructor() {
-    this.WAITING_STATUS_LINE = 0;
-    this.WAITING_STATUS_LINE_END = 1;
-    this.WAITING_HEADER_NAME = 2;
-    this.WAITING_HEADER_SPACE = 3;
-    this.WAITING_HEADER_VALUE = 4;
-    this.WAITING_HEADER_LINE_END = 5;
-    this.WAITING_HEADER_BLOCK_END = 6;
-    this.WAITING_BODY = 7;
+    this.WAITING_STATUS_LINE = 0
+    this.WAITING_STATUS_LINE_END = 1
+    this.WAITING_HEADER_NAME = 2
+    this.WAITING_HEADER_SPACE = 3
+    this.WAITING_HEADER_VALUE = 4
+    this.WAITING_HEADER_LINE_END = 5
+    this.WAITING_HEADER_BLOCK_END = 6
+    this.WAITING_BODY = 7
 
-    this.current = this.WAITING_STATUS_LINE;
-    this.statusLine = "";
-    this.headers = {};
-    this.headerName = "";
-    this.headerValue = "";
-    this.bodyParse = null;
+    this.current = this.WAITING_STATUS_LINE
+    this.statusLine = ""
+    this.headers = {}
+    this.headerName = ""
+    this.headerValue = ""
+    this.bodyParse = null
   }
 
   get isFinished() {
@@ -105,7 +105,7 @@ class ResponseParser {
   // 字符流处理
   receive(string) {
     for (let i = 0; i < string.length; i++) {
-      this.receiveChar(string.charAt(i));
+      this.receiveChar(string.charAt(i))
     }
   }
   receiveChar(char) {
@@ -125,7 +125,7 @@ class ResponseParser {
       } else if (char === '\r') {
         this.current = this.WAITING_HEADER_BLOCK_END
         if (this.headers['Transfer-Encoding'] === 'chunked')
-          this.bodyParse = new TrunkedBodyParser();
+          this.bodyParse = new TrunkedBodyParser()
       } else {
         this.headerName += char
       }
@@ -159,17 +159,17 @@ class ResponseParser {
 
 class TrunkedBodyParser {
   constructor() {
-    this.WATIING_LENGTH = 0;
-    this.WAITING_LENGTH_LINE_END = 1;
-    this.READING_TRUNK = 2;
-    this.WAITING_NEW_LINE = 3;
-    this.WAITING_NEW_LINE_END = 4;
-    this.FINISHED_NEW_LINE = 5;
-    this.FINISHED_NEW_LINE_END = 6;
-    this.isFinished = false;
-    this.length = 0;
-    this.content = [];
-    this.current = this.WAITING_LENGTH;
+    this.WATIING_LENGTH = 0
+    this.WAITING_LENGTH_LINE_END = 1
+    this.READING_TRUNK = 2
+    this.WAITING_NEW_LINE = 3
+    this.WAITING_NEW_LINE_END = 4
+    this.FINISHED_NEW_LINE = 5
+    this.FINISHED_NEW_LINE_END = 6
+    this.isFinished = false
+    this.length = 0
+    this.content = []
+    this.current = this.WAITING_LENGTH
   }
   // 字符流处理
   receiveChar(char) {
@@ -215,7 +215,7 @@ class TrunkedBodyParser {
 }
 
 void async function () {
-  const options = {
+  let request = new Request({
     method: "POST",
     path: "/",
     host: "127.0.0.1",
@@ -226,10 +226,8 @@ void async function () {
     body: {
       name: "xyh"
     }
-  }
-
-  let request = new Request(options)
+  })
 
   let response = await request.send()
-  console.log(response)
+  let dom = parser.parseHTML(response.body)
 }()

@@ -159,7 +159,7 @@ class ResponseParser {
 
 class TrunkedBodyParser {
   constructor() {
-    this.WATIING_LENGTH = 0;
+    this.WAITING_LENGTH = 0;
     this.WAITING_LENGTH_LINE_END = 1;
     this.READING_TRUNK = 2;
     this.WAITING_NEW_LINE = 3;
