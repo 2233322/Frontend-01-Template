@@ -26,7 +26,7 @@ const app = http.createServer((req, res) => {
   </head>
   <body>
       <div>
-          <img id="myid"/>
+          <img id="myid" src="http://localhost:8080/a17039448cb9ed7495752b7f3d89ef3a.jpg"/>
           <img />
       </div>
   </body>
