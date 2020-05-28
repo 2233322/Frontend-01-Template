@@ -1,24 +1,82 @@
-let currentToken = null
+const {
+  addCSSRules,
+  computeCSS
+} = require('./cssRulesParser')
+
+let currentToken = null // 当前token
 let currentAttribute = null
 
 let stack = [{
   type: 'document',
   children: []
 }]
+let currentTextNode = null
+
 const EOF = Symbol('EOF') // End Of File
 function parseHTML(html) {
   let state = data
   for (let c of html) {
-    // console.log(c)
     state = state(c)
   }
 
   state = state(EOF)
+  return stack
 }
 
 function emit(token) {
-  if (token.type !== 'text') {
-    console.log(token)
+  let top = stack[stack.length - 1]
+  if (token.type == 'startTag') {
+    let element = {
+      type: 'element',
+      children: [],
+      attributes: []
+    }
+
+    element.tagName = token.tagName
+
+    for (let p in token) {
+      if (p !== 'tagName' && p !== 'type') {
+        element.attributes.push({
+          name: p,
+          value: token[p]
+        })
+      }
+    }
+
+
+
+    top.children.push(element)
+    element.parent = top
+
+    // 元素创建好 就调用css规则
+    computeCSS(element)
+
+    // 自封闭标签不入栈
+    if (!token.isSelfClosing) {
+      stack.push(element)
+    }
+
+    currentTextNode = null
+  } else if (token.type === 'endTag') {
+    if (top.tagName !== token.tagName) {
+      throw new Error("Tag start end doesn't match!")
+    } else {
+      // 遇到style标签时，我们把css规则保存起来
+      if (top.tagName === 'style') {
+        addCSSRules(top.children[0].content)
+      }
+      stack.pop()
+    }
+    currentTextNode = null
+  } else if (token.type === 'text') {
+    if (currentTextNode === null) {
+      currentTextNode = {
+        type: 'text',
+        content: ''
+      }
+      top.children.push(currentTextNode)
+    }
+    currentTextNode.content += token.content
   }
 }
 
@@ -57,7 +115,7 @@ function tagOpen(c) {
 function endTagOpen(c) {
   if (c.match(/^[a-zA-Z]$/)) {
     currentToken = {
-      type: 'endTage',
+      type: 'endTag',
       tagName: ''
     }
     return tagName(c)
