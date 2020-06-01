@@ -15,7 +15,10 @@ function match(element, selector) {
     let attr = element.attributes.filter(attr => attr.name === 'class')[0]
     // 多个class情况
     //.a.b    class='a b c'
-    if (attr && attr.value.split(' ') > 1) {
+    if (attr && attr.value.split(' ').length > 0) {
+      if (attr.value.split(' ').length === 1) {
+        return attr.value === selector.replace('.', '')
+      }
       let classValues = attr.value.split(' ')
       selector = selector.split('.')
       selector.shift()
@@ -93,23 +96,25 @@ function computeCSS(element) {
       continue
     }
 
-    let j = 1 // j selectorParts指针
-    // i elements 指针
-    for (let i = 0, len = elements.length; i < len; i++) {
-      if (match(elements[i], selectorParts[j])) {
+    if (selectorParts.length === 1) {
+      // 如果selectorParts只有一个 matched为true
+      matched = true
+    } else {
+      let j = 1 // j selectorParts指针
 
-        // 规则匹配到了跳出循环
-        if (j === selectorParts.length - 1) {
-          matched = true
-          break
+      // i elements 指针
+      for (let i = 0, len = elements.length; i < len; i++) {
+        if (match(elements[i], selectorParts[j])) {
+
+          // 规则匹配到了跳出循环
+          if (j === selectorParts.length - 1) {
+            matched = true
+            break
+          }
+          j++
         }
-        j++
       }
     }
-
-    // if (j > selectorParts.length) {
-    //   matched = true
-    // }
 
     if (matched) {
       // 优先级

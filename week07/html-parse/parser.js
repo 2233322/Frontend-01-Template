@@ -2,6 +2,7 @@ const {
   addCSSRules,
   computeCSS
 } = require('./cssRulesParser')
+const layout = require('./layout')
 
 let currentToken = null // 当前token
 let currentAttribute = null
@@ -65,6 +66,11 @@ function emit(token) {
       if (top.tagName === 'style') {
         addCSSRules(top.children[0].content)
       }
+
+      // 结束标签布局 
+      layout(top)
+
+
       stack.pop()
     }
     currentTextNode = null

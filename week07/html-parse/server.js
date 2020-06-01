@@ -11,7 +11,8 @@ const app = http.createServer((req, res) => {
     'X-Foo2': 'bar2',
     'Content-Type': 'text/html'
   })
-  res.write(`<html maaa=a >
+
+  const cssComputing = `<html maaa=a >
   <head>
       <style>
     body div #myid{
@@ -30,7 +31,37 @@ const app = http.createServer((req, res) => {
           <img />
       </div>
   </body>
-  </html>`)
+  </html>`
+
+
+  const flexLayout = `<html>
+  <head>
+    <style>
+    .wrapper {
+      display: flex;
+      background-color: rgb(255,255,255);
+      width: 500px;
+      height: 500px;
+    }
+    .div1{
+      flex: 1;
+      background-color: rgb(255,192,203);
+      height: 250px
+    }
+    .div2{
+      flex: 1;
+      background-color: rgb(0,128,0)
+    }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="div1"></div>
+      <div class="div2"></div>
+    </div>
+  </body>
+  </html>`
+  res.write(flexLayout)
   res.end()
 })
 
