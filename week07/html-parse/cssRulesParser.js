@@ -5,6 +5,39 @@ function match(element, selector) {
     return false
   }
 
+  //div.divone#myid.div1
+  // 复合选择器判断
+  // selector.split('#')[0] 有其他选择器  后面存在.
+  // selector.splie('.')[0] 有其他选择器 length > 3  或者  后面存在#
+  // /^\w+[.#]/.test(selector) 选择符前面存在标签选择器
+  // selector.match(/\w*[.#]\w+(.*)/)  后面是否存在选择器
+
+  if (/^\w+[.#]/.test(selector) || (selector.match(/\w*[.#]\w+(.*)/) && selector.match(/\w*[.#]\w+(.*)/)[1])) {
+    selector.match(/^(\w*)((?:\.\w+)*)(#\w+)?((?:\.\w+)*)/)
+
+    let tagSelector = RegExp.$1
+    let idSelector = RegExp.$3
+    let classSelector = RegExp.$2.concat(RegExp.$4).split('.')
+    classSelector.shift()
+
+    if (tagSelector && element.tagName !== tagSelector) {
+      return false
+    }
+
+    if (idSelector) {
+      let attr = element.attributes.filter(attr => attr.name === 'id')[0]
+      if (attr && attr.value !== idSelector.replace('#', '')) {
+        return false
+      }
+    }
+
+    if (classSelector.length > 0) {
+      let attr = element.attributes.filter(attr => attr.name === 'class')[0]
+      let classValues = attr.value.split(' ')
+      return classSelector.every(item => classValues.indexOf(item) > -1)
+    }
+  }
+
   let firstChar = selector.charAt(0)
   if (firstChar === '#') {
     let attr = element.attributes.filter(attr => attr.name === 'id')[0]
@@ -23,10 +56,12 @@ function match(element, selector) {
       selector = selector.split('.')
       selector.shift()
       // 如果selector 每项都能在classValues中找到就返回true
-      return selector.every((item => classValues.indefOf(item) > -1))
+      return selector.every((item => classValues.indexOf(item) > -1))
     }
   } else if (element.tagName === selector) {
     return true
+  } else {
+    // 符合选择器
   }
   return false
 }

@@ -1,6 +1,8 @@
 # 第7周总结
 
 ## Css总体结构
+ > [css2.1标准](https://www.w3.org/TR/2011/REC-CSS2-20110607/#minitoc)
+ > [css3](https://www.w3.org/TR/css-syntax-3/)
 * @charset
 * @import
 * rules

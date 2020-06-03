@@ -1,19 +1,5 @@
-// https://www.w3.org/TR/?tag=css 抓取css文档标题和路径
-
-// let CSSList = []
-
-// let list = document.getElementById('container').children
-
-// list.forEach(item => {
-//   if (item.getAttribute('data-tag').match(/css/)) {
-//     CSSList.push({
-//       name: item.children[1].innerText,
-//       url: item.children[1].children[0].href
-//     })
-//   }
-// })
-
-let CSSStanardList = [{
+[
+  {
     "title": "Requirements for Chinese Text Layout中文排版需求",
     "url": "https://www.w3.org/TR/2020/WD-clreq-20200601/"
   },
@@ -570,25 +556,3 @@ let CSSStanardList = [{
     "url": "http://www.w3.org/TR/1998/NOTE-CSS-potential-19981210"
   }
 ]
-
-let iframe = document.createElement('iframe')
-document.body.innerHTML = ''
-document.body.appendChild(iframe)
-
-function happen(element, event) {
-  return new Promise((resolve) => {
-    let handler = () => {
-      resolve()
-      element.removeEventListener(event, handler)
-    }
-    element.addEventListener(event, handler)
-  })
-}
-
-async function loadStandard() {
-  for (let standard of CSSStanardList) {
-    console.log(standard.title)
-    iframe.src = standard.url
-    await happen(iframe, 'load')
-  }
-}

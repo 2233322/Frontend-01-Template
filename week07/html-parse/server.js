@@ -21,7 +21,7 @@ const app = http.createServer((req, res) => {
   }
   body div img{
       width:30px;
-      background-color: #ff1111;
+      background-color: red;
   }
       </style>
   </head>
@@ -43,20 +43,20 @@ const app = http.createServer((req, res) => {
       width: 500px;
       height: 500px;
     }
-    .div1{
+    div div.hello#myid.div1.divone{
       flex: 1;
-      background-color: rgb(255,192,203);
+      background-color: rgb(233,17,17);
       height: 250px
     }
     .div2{
       flex: 1;
-      background-color: rgb(0,128,0)
+      background-color: rgb(126,189,212)
     }
     </style>
   </head>
   <body>
     <div class="wrapper">
-      <div class="div1"></div>
+      <div id="myid" class="div1 divone hello"></div>
       <div class="div2"></div>
     </div>
   </body>
