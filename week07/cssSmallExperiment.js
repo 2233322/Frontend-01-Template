@@ -1,17 +1,17 @@
 // https://www.w3.org/TR/?tag=css 抓取css文档标题和路径
 
-// let CSSList = []
+let CSSList = []
 
-// let list = document.getElementById('container').children
+let list = document.getElementById('container').children
 
-// list.forEach(item => {
-//   if (item.getAttribute('data-tag').match(/css/)) {
-//     CSSList.push({
-//       name: item.children[1].innerText,
-//       url: item.children[1].children[0].href
-//     })
-//   }
-// })
+list.forEach(item => {
+  if (item.getAttribute('data-tag').match(/css/)) {
+    CSSList.push({
+      name: item.children[1].innerText,
+      url: item.children[1].children[0].href
+    })
+  }
+})
 
 let CSSStanardList = [{
     "title": "Requirements for Chinese Text Layout中文排版需求",

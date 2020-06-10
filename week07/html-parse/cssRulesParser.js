@@ -36,6 +36,8 @@ function match(element, selector) {
       let classValues = attr.value.split(' ')
       return classSelector.every(item => classValues.indexOf(item) > -1)
     }
+
+    return true
   }
 
   let firstChar = selector.charAt(0)
