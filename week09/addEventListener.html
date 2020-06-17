@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>addEventListener</title>
+  <style>
+    #root {
+      display: flex;
+      width: 500px;
+      height: 300px;
+      justify-content: center;
+      align-items: center;
+      background-color: salmon;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <button id="btn">点我点我</button>
+  </div>
+
+  <button id="click">Click me!</button>
+</body>
+
+<script>
+  const root = document.getElementById('root')
+  const btn2 = document.getElementById('btn')
+
+  var btn = document.querySelector('#click');
+
+  btn.addEventListener('alert', function (event) {
+    console.log('cfl')
+  }, false);
+
+  var evt = new Event('alert');
+
+
+
+  root.addEventListener('click', e => {
+    console.log('你点击了root')
+  }, {
+    capture: false,
+    once: false,
+    passive: false
+  })
+  btn2.addEventListener('click', e => {
+    console.log('你点击了btn')
+    btn.dispatchEvent(evt);
+  }, {
+    capture: false,
+    once: false,
+    passive: false
+  })
+</script>
+
+</html>

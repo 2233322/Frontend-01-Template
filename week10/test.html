@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+</head>
+<style>
+  div * {
+    display: block;
+  }
+</style>
+
+<body>
+  <div id="root">
+    <a href="">1</a>
+    <b>2</b>
+    <div>3</div>
+    <span>4</span>
+    <i>5</i>
+  </div>
+</body>
+<script>
+  let el = document.getElementById('root')
+
+  function reversalChild(el) {
+    let children = Array.prototype.slice.call(el.childNodes)
+    children.reverse()
+    for (let child of children) {
+      el.appendChild(child)
+    }
+  }
+</script>
+
+</html>
