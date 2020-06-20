@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Light</title>
+  <style>
+    .traffic div {
+      margin-bottom: 30px;
+      width: 150px;
+      height: 150px;
+      background-color: gray;
+      border-radius: 50%;
+    }
+
+    .green.light {
+      background-color: green;
+    }
+
+    .yellow.light {
+      background-color: yellow;
+    }
+
+    .red.light {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="traffic">
+    <div class="green"></div>
+    <div class="yellow"></div>
+    <div class="red"></div>
+  </div>
+</body>
+
+</html>
+<script>
+  function green() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('green')[0].classList.add('light')
+  }
+
+  function yellow() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('yellow')[0].classList.add('light')
+  }
+
+  function red() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('red')[0].classList.add('light')
+  }
+
+  function go() {
+    green()
+    setTimeout(yellow, 6000)
+    setTimeout(red, 8000)
+    setTimeout(go, 12000)
+  }
+</script>

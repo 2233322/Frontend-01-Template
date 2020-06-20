@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Light</title>
+  <style>
+    .traffic div {
+      margin-bottom: 30px;
+      width: 150px;
+      height: 150px;
+      background-color: gray;
+      border-radius: 50%;
+    }
+
+    .green.light {
+      background-color: green;
+    }
+
+    .yellow.light {
+      background-color: yellow;
+    }
+
+    .red.light {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="tiem"></div>
+  <div id="root" class="traffic">
+    <div class="green"></div>
+    <div class="yellow"></div>
+    <div class="red"></div>
+  </div>
+</body>
+
+</html>
+<script>
+  const Time = document.getElementById('tiem')
+  let count = 1
+  setInterval(() => {
+    Time.innerText = count++
+  }, 1000)
+
+  function green() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    count = 1
+    document.getElementsByClassName('green')[0].classList.add('light')
+  }
+
+  function yellow() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    count = 1
+    document.getElementsByClassName('yellow')[0].classList.add('light')
+  }
+
+  function red() {
+
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    count = 1
+    document.getElementsByClassName('red')[0].classList.add('light')
+  }
+
+  function go() {
+    green()
+    setTimeout(() => {
+      yellow()
+      setTimeout(() => {
+        red()
+        setTimeout(go, 4000)
+      }, 2000)
+    }, 6000)
+  }
+</script>

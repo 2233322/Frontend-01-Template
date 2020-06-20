@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Light</title>
+  <style>
+    .traffic div {
+      margin-bottom: 30px;
+      width: 150px;
+      height: 150px;
+      background-color: gray;
+      border-radius: 50%;
+    }
+
+    .green.light {
+      background-color: green;
+    }
+
+    .yellow.light {
+      background-color: yellow;
+    }
+
+    .red.light {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="traffic">
+    <div class="green"></div>
+    <div class="yellow"></div>
+    <div class="red"></div>
+  </div>
+  <button id="next">next()</button>
+</body>
+
+</html>
+<script>
+  function green() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('green')[0].classList.add('light')
+  }
+
+  function yellow() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('yellow')[0].classList.add('light')
+  }
+
+  function red() {
+    const traffics = document.getElementById('root').children
+    Array.from(traffics).forEach(cell => {
+      cell.classList.remove('light')
+    })
+    document.getElementsByClassName('red')[0].classList.add('light')
+  }
+
+  function sleep(t) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, t)
+    })
+  }
+
+  function happen(element, eventName) {
+    return new Promise((resolve, reject) => {
+      element.addEventListener(eventName, resolve, {
+        once: true
+      })
+    })
+  }
+
+  const next = document.getElementById('next')
+  async function go() {
+    green()
+    await happen(next, 'click')
+    // await sleep(6000)
+    yellow()
+    await happen(next, 'click')
+    // await sleep(2000)
+    red()
+    await happen(next, 'click')
+    // await sleep(4000)
+    go()
+  }
+</script>

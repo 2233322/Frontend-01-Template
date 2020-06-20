@@ -178,7 +178,23 @@
   }
 
 
+  // 棋谱功能
+  let openings = new Map();
+
+  openings.set([
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ].toString(), {
+    point: [1, 1],
+    result: 0
+  })
+
+
   function bestChoice(pattern, color) {
+    if (openings.has(pattern.toString())) {
+      return openings.get(pattern.toString());
+    }
     let point = willWin(pattern, color)
     if (point) { // 如果要赢就下在赢的位置
       return {
