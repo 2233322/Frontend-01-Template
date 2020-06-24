@@ -31,6 +31,39 @@
 
 </html>
 <script>
+  // 无序队列
+  class Sorted {
+    constructor(data, compare) {
+      this.data = data
+      this.compare = compare
+    }
+
+    take() {
+      if (!this.data.length) {
+        return
+      }
+      let min = this.data[0]
+      let minIndex = 0
+      for (let i = 1; i < this.data.length; i++) {
+        if (this.compare(this.data[i], min) < 0) {
+          min = this.data[i]
+          minIndex = i
+        }
+      }
+      this.data[minIndex] = this.data[this.data.length - 1]
+      this.data.pop()
+      return min
+    }
+    insert(v) {
+      this.data.push(v)
+    }
+
+    get length() {
+      return this.data.length
+    }
+  }
+
+
   const container = document.getElementById('container')
   const map = localStorage.getItem('map') ? JSON.parse(localStorage.getItem('map')) : Array(10000).fill(0)
   for (let y = 0; y < 100; y++) {
@@ -65,9 +98,87 @@
   document.addEventListener('mouseup', () => {
     mouse = false
   })
-  document.addEventListener('contextmenu', e => e.preventDefault())
+  container.addEventListener('contextmenu', e => e.preventDefault())
 
   document.getElementById('save').addEventListener('click', () => {
     localStorage.setItem('map', JSON.stringify(map))
   })
+
+  function sleep(t) {
+    return new Promise((resolve, eject) => {
+      setTimeout(resolve, t)
+    })
+  }
+
+  async function findPath(map, start, end) {
+    map = map.slice()
+
+    container.children[start[1] * 100 + start[0]].style.backgroundColor = 'coral'
+    container.children[end[1] * 100 + end[0]].style.backgroundColor = 'coral'
+
+    function distance([x, y]) {
+      return (x - end[0]) ** 2 + (y - end[1]) ** 2
+    }
+
+    let collection = new Sorted([start], (a, b) => distance(a) - distance(b))
+
+    async function insert([x, y], pre) {
+
+      // 没有填充
+      if (map[y * 100 + x] !== 0) {
+        return
+      }
+
+      // 斜边至少一个点没填充
+      // if (map[(y - 1) * 100 - x] !== 0 && map[(y + 1) * 100 - x] !== 0) {
+      //   return
+      // }
+
+      // if (map[(y - 1) * 100 + x] !== 0 && map[(y + 1) * 100 + x] !== 0) {
+      //   return
+      // }
+
+      // 越界
+      if (x < 0 || y < 0 || x >= 100 || y >= 100) {
+        return
+      }
+
+
+      map[y * 100 + x] = pre
+      container.children[y * 100 + x].style.backgroundColor = 'lightgreen'
+      await sleep(5)
+      collection.insert([x, y])
+
+    }
+
+    while (collection.length) {
+      let [x, y] = collection.take() // pop unshift / push shift
+      if (x === end[0] && y === end[1]) {
+        let path = []
+        let stepNumber = 0
+        while (x !== start[0] || y !== start[1]) {
+          stepNumber++
+          path.push([x, y])
+          container.children[y * 100 + x].style.backgroundColor = 'pink';
+          await sleep(5);
+          // console.log([x, y], map[y * 100 + x]);
+          [x, y] = map[y * 100 + x]
+        }
+        console.log('stepNumber', stepNumber)
+        return path
+      }
+      // top bottom left right
+      await insert([x - 1, y], [x, y])
+      await insert([x + 1, y], [x, y])
+      await insert([x, y - 1], [x, y])
+      await insert([x, y + 1], [x, y])
+      // 斜角
+      await insert([x - 1, y - 1], [x, y])
+      await insert([x + 1, y + 1], [x, y])
+      await insert([x + 1, y - 1], [x, y])
+      await insert([x - 1, y + 1], [x, y])
+
+    }
+    return null
+  }
 </script>
