@@ -1,0 +1,106 @@
+<input type="range" id="r" min="0" max="255">
+<input type="range" id="g" min="0" max="255">
+<input type="range" id="b" min="0" max="255">
+<div id="color" style="width: 200px;height: 200px;"></div>
+<script>
+  const handlers = new Map()
+
+  let reactivities = new Map()
+
+  let usedReactivities = []
+
+  function reactive(origin) {
+
+    if (reactivities.has(origin)) {
+      return reactivities.get(origin)
+    }
+
+    let proxy = new Proxy(origin, {
+      get(target, propKey, receiver) {
+        usedReactivities.push([target, propKey])
+        if (typeof target[propKey] === 'object') {
+          return reactive(target[propKey])
+        }
+        return target[propKey]
+      },
+      set(target, propKey, value, receiver) {
+        target[propKey] = value
+        if (handlers.get(target)) {
+          if (handlers.get(target).get(propKey)) {
+            for (let handler of handlers.get(target).get(propKey)) {
+              handler()
+            }
+          }
+        }
+        return target[propKey]
+      }
+    })
+
+    reactivities.set(origin, proxy)
+    reactivities.set(proxy, proxy)
+    return proxy
+  }
+
+  // 作用
+  function effect(handler) {
+    usedReactivities = []
+    handler()
+    for (let usedReactivity of usedReactivities) {
+      let [target, propKey] = usedReactivity
+      console.log([target, propKey])
+
+      if (!handlers.has(target)) {
+        handlers.set(target, new Map())
+      }
+
+      if (!handlers.get(target).has(propKey)) {
+        handlers.get(target).set(propKey, [])
+      }
+
+      handlers.get(target).get(propKey).push(handler)
+
+    }
+  }
+
+  let target = {
+    person: {
+      name: 'xyh',
+      age: 26
+    }
+  }
+
+  let dummy
+  const counter = reactive({
+    r: 45,
+    g: 124,
+    b: 35
+  })
+
+  effect(() => {
+    document.getElementById('r').value = counter.r
+  })
+
+  effect(() => {
+    document.getElementById('g').value = counter.g
+  })
+
+  effect(() => {
+    document.getElementById('b').value = counter.b
+  })
+
+  effect(() => {
+    document.getElementById('color').style.backgroundColor = `rgb(${counter.r}, ${counter.g}, ${counter.b})`
+  })
+
+  document.getElementById('r').addEventListener('input', event => {
+    counter.r = event.target.value
+  })
+
+  document.getElementById('g').addEventListener('input', event => {
+    counter.g = event.target.value
+  })
+
+  document.getElementById('b').addEventListener('input', event => {
+    counter.b = event.target.value
+  })
+</script>
