@@ -2,6 +2,8 @@
 <input type="range" id="g" min="0" max="255">
 <input type="range" id="b" min="0" max="255">
 <div id="color" style="width: 200px;height: 200px;"></div>
+<div id="text">Hello {{name}}!</div>
+<input type="text" name="" value="cate" id="t">
 <script>
   const handlers = new Map()
 
@@ -47,7 +49,7 @@
     handler()
     for (let usedReactivity of usedReactivities) {
       let [target, propKey] = usedReactivity
-      console.log([target, propKey])
+      //  console.log([target, propKey])
 
       if (!handlers.has(target)) {
         handlers.set(target, new Map())
@@ -103,4 +105,24 @@
   document.getElementById('b').addEventListener('input', event => {
     counter.b = event.target.value
   })
+
+
+
+
+  let range = document.createRange()
+  range.setStart(document.getElementById('text').childNodes[0], 6)
+  range.setEnd(document.getElementById('text').childNodes[0], 14)
+  let data = reactive({
+    text: 'world'
+  })
+  range.extractContents()
+  console.log(range)
+
+  effect(() => {
+    range.extractContents()
+    range.insertNode(document.createTextNode(data.text))
+  })
+
+
+  data.text = 'xyh'
 </script>

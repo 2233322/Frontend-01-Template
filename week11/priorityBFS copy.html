@@ -1,0 +1,122 @@
+<script>
+  let graph = {
+    'A': {
+      'B': 5,
+      'C': 1
+    },
+    'B': {
+      "A": 5,
+      'C': 2,
+      'D': 1
+    },
+    'C': {
+      'A': 1,
+      'B': 2,
+      'D': 4,
+      'E': 8
+    },
+    'D': {
+      'B': 1,
+      'C': 4,
+      'E': 3,
+      'F': 6
+    },
+    'E': {
+      'C': 8,
+      'D': 3
+    },
+    'F': {
+      'D': 6
+    }
+  }
+
+  class Node {
+    constructor(data, priority) {
+      this.data = data
+      this.priority = priority
+    }
+  }
+
+  class PriorityQueue {
+    constructor() {
+      this.pqueue = []
+    }
+
+    // 入堆
+    heappush(data, priority) {
+      let node = new Node(data, priority)
+      if (this.pqueue.length === 0) {
+        this.pqueue.push(node)
+      } else {
+        let isPushed = false
+        for (let i = 0; i < this.pqueue.length; i++) {
+          if (this.pqueue[i].priority > node.priority) {
+            this.pqueue.splice(i, 0, node)
+            isPushed = true
+            break
+          }
+        }
+        if (!isPushed) {
+          this.pqueue.push(node)
+        }
+      }
+    }
+
+    // 出堆
+    heappop() {
+      return this.pqueue.shift()
+    }
+
+    get length() {
+      return this.pqueue.length
+    }
+  }
+
+
+
+  function dijkstra(graph, s) {
+    let pqueue = new PriorityQueue()
+    pqueue.heappush(s, 0)
+
+    let seen = new Map()
+
+    let parent = {
+      [s]: null
+    }
+
+    let distances = {
+      [s]: 0
+    }
+
+    while (pqueue.length) {
+      let pair = pqueue.heappop()
+      let vertex = pair.data
+      let dist = pair.priority
+
+      if (!seen.has(vertex)) {
+        seen.set(vertex, true)
+      }
+
+
+
+      for (let w of Object.keys(graph[vertex])) {
+        if (!seen.has(w)) {
+          if (typeof distances[w] === 'undefined' || dist + graph[vertex][w] < distances[w]) {
+            pqueue.heappush(w, dist + graph[vertex][w])
+            parent[w] = vertex
+            distances[w] = dist + graph[vertex][w]
+          }
+        }
+
+      }
+
+    }
+
+    return {
+      parent,
+      distances
+    }
+  }
+
+  console.log(dijkstra(graph, 'A'))
+</script>

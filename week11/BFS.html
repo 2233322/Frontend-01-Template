@@ -1,0 +1,120 @@
+<script>
+  let graph = {
+    'A': ['B', 'C'],
+    'B': ["A", 'C', 'D'],
+    'C': ['A', 'B', 'D', 'E'],
+    'D': ['B', 'C', 'E', 'F'],
+    'E': ['C', 'D'],
+    'F': ['D']
+  }
+
+  class Node {
+    constructor(data, priority) {
+      this.data = data
+      this.priority = priority
+    }
+  }
+
+  // 优先队列
+  class PriorityQueue {
+    constructor() {
+      this.pqueue = []
+    }
+
+    // 入堆
+    heappush(data, priority) {
+      const node = new Node(data, priority)
+      if (!this.pqueue.length) {
+        this.pqueue.push(node)
+      } else {
+        let isPush = false
+        for (let i = 0; i < this.pqueue.length; i++) {
+          if (this.pqueue[i].priority > node.priority) {
+            this.pqueue.splice(i, 0, node)
+            isPush = true
+            break
+          }
+        }
+        if (!isPush) {
+          this.pqueue.push(node)
+        }
+      }
+    }
+
+    // 出堆
+    heappop() {
+      return this.pqueue.shift()
+    }
+  }
+
+
+  // 广度优先
+  function bfs(graph, s) {
+    let parent = {
+      [s]: null
+    }
+    let path = []
+    let queue = [s]
+    let seen = new Map()
+    seen.set(s, true)
+    while (queue.length) {
+      let vertex = queue.shift()
+      for (let w of graph[vertex]) {
+        if (!seen.has(w)) {
+          queue.push(w)
+          seen.set(w, true)
+          parent[w] = vertex
+        }
+      }
+      path.push(vertex)
+
+    }
+    return {
+      path,
+      parent
+    }
+  }
+
+
+  // 深度优先
+  function dfs(graph, s) {
+    let path = []
+    let stack = [s]
+    let seen = new Map()
+    seen.set(s, true)
+
+    while (stack.length) {
+      let vertex = stack.pop()
+      for (let w of graph[vertex]) {
+        if (!seen.has(w)) {
+          stack.push(w)
+          seen.set(w, true)
+        }
+      }
+
+      path.push(vertex)
+    }
+
+    return path
+  }
+
+  console.log('bfs')
+  let {
+    parent,
+    path
+  } = bfs(graph, 'F')
+
+  console.log(parent, path)
+
+  let v = 'A'
+  while (v != null) {
+    console.log(v)
+    v = parent[v]
+
+  }
+
+
+
+  console.log('dfs')
+  console.log(dfs(graph, 'E'))
+</script>
