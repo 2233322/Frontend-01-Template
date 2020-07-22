@@ -1,0 +1,87 @@
+<script>
+  // 实现一个并发限制的异步调度器 Scheduler,保证同时运行的任务最多两个
+
+  class Scheduler {
+    list = []
+    maxTask = 2
+    workingTask = 0
+
+    add(promiseCreator) {
+      this.list.push(promiseCreator)
+    }
+
+    start() {
+      for (let i = 0; i < this.maxTask; i++) {
+        this.doNext()
+      }
+    }
+
+    doNext() {
+      if (this.list.length && this.workingTask < this.maxTask) {
+        this.workingTask++
+        this.list.shift()().then(() => {
+          this.workingTask--
+          this.doNext()
+        })
+      }
+    }
+  }
+
+  const timeout = time => new Promise(resolve => setTimeout(resolve, time))
+
+  const scheduler = new Scheduler()
+
+  const addTask = (time, order) => {
+    scheduler.add(() => timeout(time).then(() => console.log(order)))
+  }
+
+
+  addTask(1000, 1)
+  addTask(500, 2)
+  addTask(300, 3)
+  addTask(400, 4)
+
+  scheduler.start()
+
+
+
+
+  // function asyncPool(poolLimit, array, iteratorFn) {
+  //   let i = 0;
+  //   const ret = [];
+  //   const executing = [];
+  //   const enqueue = function () {
+  //     // 边界处理，array为空数组
+  //     if (i === array.length) {
+  //       return Promise.resolve();
+  //     }
+  //     // 每调一次enqueue，初始化一个promise
+  //     const item = array[i++];
+  //     const p = Promise.resolve().then(() => iteratorFn(item, array));
+  //     // 放入promises数组
+  //     console.log(p)
+  //     ret.push(p);
+  //     // promise执行完毕，从executing数组中删除
+  //     const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+  //     // 插入executing数字，表示正在执行的promise
+  //     executing.push(e);
+  //     // 使用Promise.rece，每当executing数组中promise数量低于poolLimit，就实例化新的promise并执行
+  //     let r = Promise.resolve();
+  //     if (executing.length >= poolLimit) {
+  //       r = Promise.race(executing);
+  //     }
+  //     // 递归，直到遍历完array
+  //     return r.then(() => enqueue());
+  //   };
+  //   return enqueue().then(() => Promise.all(ret));
+  // }
+
+
+  // const timeout = t => new Promise(resolve => setTimeout(() => resolve(t), t));
+
+  // function a() {
+  //   return asyncPool(2, [6000, 2000, 3000, 2000], timeout).then(results => {
+  //     console.log(results)
+  //   })
+  // }
+</script>
