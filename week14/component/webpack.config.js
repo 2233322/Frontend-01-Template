@@ -1,7 +1,10 @@
 const path = require('path')
+const webpack = require('webpack')
+
 module.exports = {
-  mode: 'none',
-  entry: './src/main.js',
+  mode: 'development',
+  // entry: './src/main.js',
+  entry: './src/carousel.js',
   output: {
     path: path.join(__dirname, './dist'),
     filename: 'index.js'
@@ -11,5 +14,12 @@ module.exports = {
       test: /\.js$/,
       use: 'babel-loader'
     }]
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ],
+  devServer: {
+    hot: true,
+    contentBase: './dist'
   }
 }
