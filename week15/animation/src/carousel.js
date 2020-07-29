@@ -1,5 +1,5 @@
+
 import React from './react'
-import {Carousel} from './carousel.vue'
 
 
 // class MyComponent {
@@ -49,7 +49,7 @@ import {Carousel} from './carousel.vue'
 // }
 
 
-/*class Carousel {
+class Carousel {
   constructor(config) {
     this.children = []
     this.root = document.createElement('div')
@@ -128,7 +128,7 @@ import {Carousel} from './carousel.vue'
 
       setTimeout(nextPic, 3000)
     }
-    //setTimeout(nextPic, 3000)
+    setTimeout(nextPic, 3000)
 
     root.addEventListener('mousedown', event => {
       let startX = event.clientX
@@ -196,7 +196,7 @@ import {Carousel} from './carousel.vue'
     this.render().mountTo(parent)
   }
 
-}*/
+}
 
 let data = [
   "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
@@ -206,7 +206,7 @@ let data = [
 ]
 
 
-let component = <Carousel data={data}/>
+let component = <Carousel data={data} />
 
 
 

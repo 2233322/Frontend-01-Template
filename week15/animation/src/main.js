@@ -31,15 +31,15 @@ class Wrapper {
     this.root = document.createElement(type)
   }
 
-  setAttribute(name, value) {
+  setAttribute (name, value) {
     this.root.setAttribute(name, value)
   }
 
-  appendChild(child) {
+  appendChild (child) {
     child.mountTo(this.root)
   }
 
-  mountTo(parent) {
+  mountTo (parent) {
     parent.appendChild(this.root)
   }
 }
@@ -49,7 +49,7 @@ class Text {
     this.root = document.createTextNode(text)
   }
 
-  mountTo(parent) {
+  mountTo (parent) {
     parent.appendChild(this.root)
   }
 }
@@ -64,46 +64,52 @@ class MyComponent {
   //   console.log(`Parent::id`, v)
   // }
 
-  setAttribute(name, value) {
+  setAttribute (name, value) {
     this.root.setAttribute(name, value)
   }
 
-  appendChild(child) {
+  appendChild (child) {
     // child.mountTo(this.root)
     this.children.push(child)
   }
 
-  render() {
+  render () {
 
-      return <article>
-        <header> I 'm a header</header> {
-      this.slot
-    } <footer> I 'm a footer</footer></article>
-}
-
-mountTo(parent) {
-
-  this.slot = <div> </div>
-
-  for (let child of this.children) {
-    //child.mountTo(this.root)
-
-    this.slot.appendChild(child)
+    return <article>
+      <header>I'm a header</header>
+      {this.slot}
+      <footer>I'm a footer</footer>
+    </article>
   }
 
-  this.render().mountTo(parent)
+  mountTo (parent) {
 
-  // parent.appendChild(this.root)
+    this.slot = <div></div>
+
+    for (let child of this.children) {
+      //child.mountTo(this.root)
+
+      this.slot.appendChild(child)
+    }
+
+    this.render().mountTo(parent)
+
+    // parent.appendChild(this.root)
+
+  }
 
 }
 
-}
+
+let component = <MyComponent id="123" class="clss" style="width:100px;height:100px;background:red">
+  <div>text texrt</div>
+</MyComponent>
 
 
-let component = <MyComponent id = "123" class = "clss" style = "width:100px;height:100px;background:red">
-  <div>text texrt</div> </MyComponent>
-  
-  component.mountTo(document.getElementById('root'))
+
+component.mountTo(document.getElementById('root'))
+
+
 // console.log(component)
 // component.id = 4
 

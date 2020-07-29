@@ -1,5 +1,7 @@
 <template>
-  <div></div>
+  <div>
+  <img id="abc"  class="cls"/>
+  </div>
 </template>
 <script>
 export default {
@@ -8,6 +10,10 @@ export default {
   },
   computed: {
     reversedMessage: function () {
+      let i = 1
+      while (i < 100) {
+        i = i + 1
+      }
       return this.message.split('').reverse().join('')
     }
   }
