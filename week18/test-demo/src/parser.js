@@ -66,6 +66,8 @@ function emit(token) {
       top.children.push(currentTextNode)
     }
     currentTextNode.content += token.content
+  } else if (token.type === 'comment') {
+    top.children.push(token.content)
   }
 }
 
@@ -117,17 +119,38 @@ function endTagOpen(c) {
     }
     return tagName(c)
   } else if (c === '>') {
-
-  } else if (c = EOF) {
+    new Error("missing-end-tag-name parse error!")
+    return data
+  } else if (c === EOF) {
 
   } else {
+    currentToken = {
+      type: 'comment',
+      content: '<!--'
+    }
+    return bogusComment(c)
+  }
+}
 
+// https://html.spec.whatwg.org/multipage/parsing.html#bogus-comment-state
+function bogusComment(c) {
+  if (c === '>') {
+    currentToken.content += '-->'
+    emit(currentToken)
+    return data
+  } else if (c === EOF) {
+
+  } else if (c === '\u0000') {
+
+  } else {
+    currentToken.content += c
+    return bogusComment
   }
 }
 
 // in script
 function scriptData(c) {
-  console.log('script data!!!!')
+ // console.log('script data!!!!')
   if (c === '<') {
     return scriptDataLessThanSign
   } else {
@@ -144,6 +167,13 @@ function scriptData(c) {
 function scriptDataLessThanSign(c) {
   if (c === '/') {
     return scriptDataEndTagOpen
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '<'
+    })
+
+    return scriptDataLessThanSign
   } else {
 
     emit({
@@ -164,6 +194,14 @@ function scriptDataLessThanSign(c) {
 function scriptDataEndTagOpen(c) {
   if (c === 's') {
     return scriptDataEndTagNameS
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -188,6 +226,18 @@ function scriptDataEndTagOpen(c) {
 function scriptDataEndTagNameS(c) {
   if (c === 'c') {
     return scriptDataEndTagNameC
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 's'
+    })
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -206,6 +256,18 @@ function scriptDataEndTagNameS(c) {
 function scriptDataEndTagNameC(c) {
   if (c === 'r') {
     return scriptDataEndTagNameR
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 'sc'
+    })
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -224,6 +286,18 @@ function scriptDataEndTagNameC(c) {
 function scriptDataEndTagNameR(c) {
   if (c === 'i') {
     return scriptDataEndTagNameI
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 'scr'
+    })
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -242,6 +316,18 @@ function scriptDataEndTagNameR(c) {
 function scriptDataEndTagNameI(c) {
   if (c === 'p') {
     return scriptDataEndTagNameP
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 'scri'
+    })
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -260,6 +346,19 @@ function scriptDataEndTagNameI(c) {
 function scriptDataEndTagNameP(c) {
   if (c === 't') {
     return scriptDataEndTag
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 'scrip'
+    })
+
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -285,6 +384,18 @@ function scriptDataEndTag(c) {
       tagName: 'script'
     })
     return data
+  } else if (c === '<') {
+    emit({
+      type: 'text',
+      content: '</'
+    })
+
+    emit({
+      type: 'text',
+      content: 'script'
+    })
+
+    return scriptDataLessThanSign
   } else {
     emit({
       type: 'text',
@@ -311,6 +422,7 @@ function tagName(c) {
     emit(currentToken)
     return data
   } else {
+    currentToken.tagName += c.toLowerCase()
     return tagName
   }
 }
@@ -319,9 +431,10 @@ function beforeAttributeName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName
   } else if (c === '>') {
-    return afterAttributeName(c)
+    emit(currentToken)
+    return data
   } else if (c === '=') {
-    return beforeAttributeName // TODO
+    return beforeAttributeName // TODO  <div =
   } else {
     currentAttribute = {
       name: '',
@@ -332,12 +445,16 @@ function beforeAttributeName(c) {
 }
 
 function attributeName(c) {
-  if (c.match(/^[\t\n\f ]$/) || c === '/' || c === EOF) {
+  if (c.match(/^[\t\n\f ]$/)) {
     return afterAttributeName(c)
   } else if (c === '=') {
     return beforeAttributeValue
   } else if (c === '\u0000') {
 
+  } else if (c === '>') {
+    currentToken[currentAttribute.name] = currentAttribute.value
+    emit(currentToken)
+    return data
   } else {
     currentAttribute.name += c
     return attributeName
@@ -345,8 +462,8 @@ function attributeName(c) {
 }
 
 function beforeAttributeValue(c) {
-  if (c.match(/^[\t\n\f ]$/ || c === '/' || c === '>' || c === EOF)) {
-    return beforeAttributeValue // TODO
+  if (c.match(/^[\t\n\f ]$/)) {
+    return beforeAttributeValue
   } else if (c === '\"') {
     return doubleQuotedAttributeValue
   } else if (c === "\'") {
@@ -389,7 +506,7 @@ function singleQuotedAttributeValue(c) {
 function afterQuotedAttributeValue(c) {
   if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName
-  } else if (c === '/') {
+  } else if (c === '/') { // <img id='dd'/
     return selfClosingStartTag
   } else if (c === '>') {
     currentToken[currentAttribute.name] = currentAttribute.value
@@ -433,7 +550,7 @@ function selfClosingStartTag(c) {
 }
 
 function afterAttributeName(c) {
-  if (c.match(/^[^[\t\n\f ]$]/)) {
+  if (c.match(/^[\t\n\f ]$/)) {
     return afterAttributeName
   } else if (c === '/') {
     return selfClosingStartTag
@@ -474,5 +591,17 @@ function parseHTML(html) {
   return stack[0]
 }
 
+
+parseHTML(`<div enable></div>`)
+
+// let code = `<div>hello</div>
+// let name = 2233322
+// </s
+// </sc
+// </scr
+// </scri
+// </scrip`
+//         let doc = parseHTML(`<script>${code}</script>`)
+//         console.log(doc.children[0])
 
 module.exports.parseHTML = parseHTML
