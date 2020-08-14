@@ -572,7 +572,7 @@ function afterAttributeName(c) {
   }
 }
 
-function parseHTML(html) {
+export function parseHTML(html) {
   let state = data
   stack =  [{
     type: 'document',
@@ -604,4 +604,3 @@ parseHTML(`<div enable></div>`)
 //         let doc = parseHTML(`<script>${code}</script>`)
 //         console.log(doc.children[0])
 
-module.exports.parseHTML = parseHTML

@@ -1,5 +1,5 @@
-let assert = require('assert')
-let { add } = require('../src/add')
+import assert from 'assert'
+import { add } from '../src/add.js'
 
 describe('Add', () => {
     it('add(3, 4) should equal 7', () => {

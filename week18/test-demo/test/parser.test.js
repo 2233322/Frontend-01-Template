@@ -1,5 +1,5 @@
-let assert = require('assert')
-let { parseHTML } = require('../src/parser')
+import assert  from 'assert'
+import { parseHTML } from '../src/parser.js'
 
 describe('ParseHTML', () => {
     it('parse a single element', () => {
@@ -23,8 +23,6 @@ describe('ParseHTML', () => {
     it('parse a single element', () => {
         let doc = parseHTML('<div12></div12>')
         let div = doc.children[0]
-        console.log(div)
-
     })
 
 
